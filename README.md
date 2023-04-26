@@ -1,8 +1,11 @@
 # symfony-project-setup
 Common instructions to pull and setup a Symfony/MySql porject
 
+## Local setup
+
 1) Setup PHP >= 8.1 and extensions
 
+PHP version and extensions are specified in the `composer.json` file
 
 ```bash
 // For MacOX
@@ -84,13 +87,20 @@ composer install
 yarn
 ```
 
-10) Install certificates for local SSL
+10) Create the first User
+
+You can either
+
+* Write a custom command such as this one https://github.com/symfony/demo/blob/main/src/Command/AddUserCommand.php
+* Or create it straight into the database https://symfony.com/doc/6.2/the-fast-track/en/15-security.html#generating-a-password-for-the-admin-user
+
+11) Install certificates for local SSL
 
 ```bash
 symfony server:ca:install
 ```
 
-11) Setup tests 
+12) Setup tests 
 
 ```bash
 mysql
@@ -98,3 +108,12 @@ CREATE DATABASE {test_db_name}; GRANT ALL PRIVILEGES ON {test_db_name} . * TO '{
 symfony console doctrine:migrations:migrate --env=test
 php ./vendor/bin/simple-phpunit tests
 ```
+
+## Deploy to a real server
+
+You can deploy to almost any server, any OS, on any web server, on a IAAS or a PAAS infrastructure, on a raw VM or on a dockerized infrastructure.
+The easiest way is, according to me, to use Symfony Cloud (Platform.sh) : https://symfony.com/cloud/
+For more information about deployment of a Symfony Application, and web server configuration, please follow the official symfony documentation"
+
+* https://symfony.com/doc/current/deployment.html
+* https://symfony.com/doc/current/setup/web_server_configuration.html
