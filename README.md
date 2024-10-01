@@ -1,106 +1,137 @@
 # symfony-project-setup
-Common instructions to pull and setup a Symfony/MySql porject
+Common instructions to pull and setup a Symfony/MySQL project
 
-## Local setup
+## Local Setup
 
-1) Setup PHP >= 8.1 and extensions
+### Installation of Dependencies
 
-PHP version and extensions are specified in the `composer.json` file
+#### 1. Install PHP >= 8.3 and Extensions
 
-```bash
-// For MacOX
-brew install php pkg-config imagemagick
-pecl install imagick fileinfo iconv
-// For Linux (depends on the package manger fo course)
-sudo apt update && sudo apt install --no-install-recommends php8.1
-sudo apt-get install -y php8.1-cli php8.1-common php8.1-mysql php8.1-zip php8.1-gd php8.1-mbstring php8.1-curl php8.1-xml php8.1-bcmath php8.1-imagick php8.1-fileinfo php8.1-iconv
-pecl install imagick fileinfo iconv
-```
+The required PHP version and extensions are specified in the composer.json file.
 
-2) Install Composer globally
+To install PHP 8.3 and the necessary extensions:
+- **For Linux:**
+   1. Add the repository for PHP 8.3:
+    ```bash
+    sudo add-apt-repository ppa:ondrej/php
+    sudo apt update
+    ```
+   2. Install PHP 8.3 with extensions:
+    ```bash
+    sudo apt install php8.3 php8.3-cli php8.3-{bz2,curl,mbstring,intl}
+    sudo apt install php8.3-fpm
+    sudo apt-get install -y php8.3-common php8.3-mysql php8.3-zip php8.3-gd php8.3-mbstring php8.3-curl php8.3-xml php8.3-bcmath php8.3-imagick php8.3-fileinfo php8.3-iconv
+    pecl install imagick fileinfo iconv
+    ```
+
+- **For macOS:**
+    ```bash
+    brew tap shivammathur/php
+    brew install php@8.3
+    brew install imagemagick
+    ```
+
+#### 2. Install Composer Globally
 
 ```bash
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
+sudo mv composer.phar /usr/local/bin/composer
 ```
 
-3) Install Symfony binary
+#### 3. Install Symfony Binary
 
-https://symfony.com/download
+- **For macOS:**
+    ```bash
+    brew install symfony-cli/tap/symfony-cli
+    ```
 
+- **For Linux:**
+    ```bash
+    wget https://get.symfony.com/cli/installer -O - | bash
+    sudo mv ~/.symfony5/bin/symfony /usr/local/bin/symfony
+    ```
 
+### Database Configuration
+
+#### 4. Install MySQL
+
+- **For Linux:**
+    ```bash
+    sudo apt install mysql-server
+    sudo mysql_secure_installation
+    ```
+
+- **For macOS:**
+    ```bash
+    brew install mysql
+    brew services start mysql
+    ```
+
+#### 5. Copy OAuth Keys
+
+Note: Before copying the keys, create the oauth folder manually:
 ```bash
-// For MacOX
-brew install symfony-cli/tap/symfony-cli
-// For Linux
-curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
-sudo apt install symfony-cli
-```
-
-
-4) Install MySqL
-
-```bash
-// For MacOX
-brew instal mySql
-// For Linux
-sudo apt install mysql-server
-sudo mysql_secure_installation
-```
-
-5) Copy keys from ./tests/keys to ./var/oauth
-
-```bash
+mkdir -p ./var/oauth
 cp ./tests/keys/* ./var/oauth
 ```
 
-6) Create a MySql database, user, and grant
+#### 6. Create a MySQL Database, User, and Grant Privileges
 
 ```bash
 mysql
-CREATE USER '{db_user}'@'localhost' IDENTIFIED BY '{db_pwd}'; CREATE DATABASE {db_name}; GRANT ALL PRIVILEGES ON {db_name} . * TO '{db_user}'@'localhost';
+CREATE USER '{db_user}'@'localhost' IDENTIFIED BY '{db_pwd}';
+CREATE DATABASE {db_name};
+GRANT ALL PRIVILEGES ON {db_name} . * TO '{db_user}'@'localhost';
 ```
 
-7) Run migrations
+### Other Configurations
+
+#### 7. Run Migrations
 
 ```bash
-symfony console docrine:migrations:migrate
+symfony console doctrine:migrations:migrate
 ```
 
-8) Install Node, Npm, Yarn
+#### 8. Install Node, NPM, Yarn
 
+- **For macOS:**
+    ```bash
+    brew install node
+    ```
+
+- **For Linux:**
+    ```bash
+    sudo apt install nodejs npm
+    ```
+
+For both systems, install Yarn:
 ```bash
-// For MacOX
-brew instal node
-// For Linux
-sudo apt install nodejs npm
-// For both, install Yarn
 npm i -g yarn
 ```
 
-9) Install Dependencies
+#### 9. Install Dependencies
 
 ```bash
 composer install
 yarn
 ```
 
-10) Create the first User
+#### 10. Create the First User
 
-You can either
+You can either:
+* Write a custom command such as this one [AddUserCommand.php](https://github.com/symfony/demo/blob/main/src/Command/AddUserCommand.php)
+* Or create it straight into the database [Generating a Password for the Admin User](https://symfony.com/doc/6.2/the-fast-track/en/15-security.html#generating-a-password-for-the-admin-user)
 
-* Write a custom command such as this one https://github.com/symfony/demo/blob/main/src/Command/AddUserCommand.php
-* Or create it straight into the database https://symfony.com/doc/6.2/the-fast-track/en/15-security.html#generating-a-password-for-the-admin-user
-
-11) Install certificates for local SSL
+#### 11. Install Certificates for Local SSL
 
 ```bash
 symfony server:ca:install
 ```
 
-12) Setup tests 
+#### 12. Setup Tests
 
 ```bash
 mysql
@@ -109,11 +140,11 @@ symfony console doctrine:migrations:migrate --env=test
 php ./vendor/bin/simple-phpunit tests
 ```
 
-## Deploy to a real server
+## Deploy to a Real Server
 
-You can deploy to almost any server, any OS, on any web server, on a IAAS or a PAAS infrastructure, on a raw VM or on a dockerized infrastructure.
-The easiest way is, according to me, to use Symfony Cloud (Platform.sh) : https://symfony.com/cloud/
-For more information about deployment of a Symfony Application, and web server configuration, please follow the official symfony documentation"
+You can deploy to almost any server, any OS, on any web server, on an IAAS or a PAAS infrastructure, on a raw VM or on a dockerized infrastructure. The easiest way is, according to me, to use Symfony Cloud (Platform.sh): [Symfony Cloud](https://symfony.com/cloud/).
 
-* https://symfony.com/doc/current/deployment.html
-* https://symfony.com/doc/current/setup/web_server_configuration.html
+For more information about the deployment of a Symfony Application and web server configuration, please follow the official Symfony documentation:
+
+* [Deployment](https://symfony.com/doc/current/deployment.html)
+* [Web Server Configuration](https://symfony.com/doc/current/setup/web_server_configuration.html)
