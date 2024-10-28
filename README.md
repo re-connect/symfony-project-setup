@@ -106,6 +106,11 @@ symfony console doctrine:migrations:migrate
     ```bash
     sudo apt install nodejs npm
     ```
+- For better compatibility with the actual node version on our servers, it is possible to use [nvm](https://github.com/nvm-sh/nvm). All you have to do is to install nvm and run
+    ```bash
+    nvm use
+    ```
+  On project's root directory
 
 For both systems, install Yarn:
 ```bash
